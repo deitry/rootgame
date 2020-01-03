@@ -1,0 +1,7 @@
+namespace RootBase
+{
+    interface IAction
+    {
+
+    }
+}

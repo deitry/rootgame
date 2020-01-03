@@ -1,0 +1,7 @@
+namespace RootBase
+{
+    class GameState
+    {
+
+    }
+}
