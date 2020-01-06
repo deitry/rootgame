@@ -1,0 +1,24 @@
+# пример оформления карты в некотором формате данных
+
+Site1:
+    Type: Village
+    Suit: Mouse
+    Roads: [
+        Site2,
+        Site3,
+    ]
+
+Site2:
+    Type: Village
+    Suit: Fox
+    Roads: [
+        Site1,
+        Site3,
+    ]
+
+Site3:
+    Type: Forest
+    Roads: [
+        Site1,
+        Site2,
+    ]

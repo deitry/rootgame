@@ -1,2 +1,6 @@
+# Build
 **/bin/
 **/obj/
+
+# User configs
+.vscode/
