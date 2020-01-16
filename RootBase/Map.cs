@@ -7,9 +7,6 @@ namespace RootBase
         Road,
         River,
         RiverBridge,
-        // ForestRoad, // связь с чащей
-        // вместо ForestRoad будем использовать просто Road,
-        // а для проверки проходиости надо будет оценивать, является ли конечный пункт лесом
     }
 
     class Link
@@ -21,52 +18,42 @@ namespace RootBase
             this.Site2 = site2;
         }
 
-        // properties
         public LinkType Type { get; private set; }
 
         public string Site1;
         public string Site2;
     }
 
-    enum SiteType
-    {
-        Village,
-        Forest,
-    }
-
     enum SiteSuit
     {
-        None, // для чащи
         Mouse,
         Rabbit,
         Fox,
     }
 
-    class Site : GameObject
+    internal class Site : GameObject
     {
-        public Site(SiteType type, string Name, SiteSuit suit = SiteSuit.None)
-            : base(Name, "map site")
+        public Site(string name) : base(name, "map site") { }
+    }
+
+    class Forest : Site
+    {
+        public Forest(string name) : base(name) { }
+    }
+
+    class Village : Site
+    {
+        public Village(string name, SiteSuit suit)
+            : base(name)
         {
-            this.Type = type;
-            if (this.Type == SiteType.Village)
-            {
-                if (suit == SiteSuit.None)
-                    throw new System.Exception("Site must have suit other than None");
-
-                // пока что всем деревням даём по два слота
-                this.Slots = 2;
-
-                // FIXME: руины раскидывать случайным образом?
-            }
+            // пока что всем деревням даём по два слота
+            this.Slots = 2;
+            this.Suit = suit;
         }
 
-        // имя пока не разрешаем менять в процессе игры, потому что идентификатор
-        // - в дальнейшем можно разрешить это делать тем, кто владеет поляной
-
-        public SiteType Type { get; }
         public SiteSuit Suit { get; }
 
-        // максимальное количество слотов под здания
+        // максимальное количество строений, которое можно здесь разместить
         public int Slots { get; private set; }
     }
 
@@ -82,18 +69,16 @@ namespace RootBase
             this.Links = links;
         }
 
+        // самая простая карта, которую можно придумать
         public static Map Map1()
         {
-            // самая простая карта, которую можно придумать
-            // TODO: не забыть научиться указывать, какие клетки являются противоположными
-
             return new Map(
                 new List<Site>
                 {
-                    new Site(SiteType.Village, "Village1", SiteSuit.Fox),
-                    new Site(SiteType.Village, "Village2", SiteSuit.Mouse),
-                    new Site(SiteType.Village, "Forest1", SiteSuit.Mouse),
-                    new Site(SiteType.Village, "Forest2", SiteSuit.Mouse),
+                    new Village("Village1", SiteSuit.Fox),
+                    new Village("Village2", SiteSuit.Mouse),
+                    new Forest("Forest1"),
+                    new Forest("Forest2"),
                 },
                 new List<Link>
                 {
