@@ -3,8 +3,16 @@ using System.Collections.Generic;
 namespace RootBase
 {
     // определяем цену по количеству объектов для крафта заданного типа
-    using TotalCost = Dictionary<SiteSuit, int>;
+    // using TotalCost = Dictionary<SiteSuit, int>;
+    internal class TotalCost
+    {
+        // в стоимости карт используются только масти мест
+        internal readonly Dictionary<SiteSuit, int> Suits;
 
+        internal TotalCost(Dictionary<SiteSuit, int> suits) { this.Suits = suits; }
+    }
+
+    // масть самой карты
     enum CardSuit
     {
         Mouse,
@@ -26,9 +34,9 @@ namespace RootBase
 
     public class Card
     {
-        CardSuit Suit;
-        CardType Type;
-        TotalCost Cost;
-        Action Effect;
+        internal CardSuit Suit;
+        internal CardType Type;
+        internal TotalCost Cost;
+        internal Action Effect;
     }
 }

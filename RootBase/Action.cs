@@ -4,31 +4,31 @@ namespace RootBase
 {
     public class Action
     {
-        public Action(string effect) { this.Effect = effect; }
+        public readonly string Description;
 
-        // FIXME: пока я не понимаю, как это сделать правильно, действие представляет из себя
-        // слегка формализированную строку ~ псевдо скритовый язык.
-        // Возможно правила так и стоит описывать, чтобы иметь возможность их легко подменять,
-        // но типизация - это тоже очень круто
+        internal delegate void ActionHandler(GameActionInterface gameAi, IController controller);
+        public readonly bool CanBePassed = true;
 
-        // синтаксис
-        // add - добавить объект
-        // mandatory - обязательно к выполнению, нельзя пропустить
-        // name= - может быть опущено (?) - имя объекта
-        // site= - место, куда надо поставить
-        // объекты вне карты имеет смысл рассчитывать исходя из того, что стоит на карте,
-        // ибо максимальное количество ограничено
-        // site=each - везде, если разрешено restriction
-        // choose - возможность выбора
-        // restriction= - ограничение на выбор
-        // resource= - сколько нужно ресурса для осуществления действия
-        // function() - рассчитывает значение
-        // opposed(name=citadel) - ищет объект citadel, берёт его "координаты", находит противоположную клетку
-        public readonly string Effect;
+        internal Action(string description, ActionHandler handler)
+        {
+            this.Description = description;
+            this.Handler = handler;
+        }
 
-        // некоторые действия имеют постэффект, который является тоже похожим действием
-        public readonly string PostEffect;
+        internal Action(string description, ActionHandler handler, bool canBePassed)
+        {
+            this.Description = description;
+            this.Handler = handler;
+            this.CanBePassed = canBePassed;
+        }
 
-        public bool MustChoose { get => this.Effect.Contains("choose"); }
+        internal ActionHandler Handler;
+    }
+
+    // чтобы прозрачнее обозначать вместо лишнего параметра в конструкторе
+    internal class MandatoryAction : Action
+    {
+        internal MandatoryAction(string description, ActionHandler handler)
+            : base(description, handler, false) { }
     }
 }

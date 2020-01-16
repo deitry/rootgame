@@ -3,10 +3,9 @@ using System.Collections.Generic;
 namespace RootBase
 {
     /*
-    Здесь перечисляем все функции, которые будут доступны игрокам.
-
-    Создаём этакий класс Б-га, чтобы понять, что вообще нам надо от игры.
-    Потом уже будем рефакторить
+    Здесь перечисляем базовые функции получения сведений, которые будут доступны для Action.
+    Перечисленные здесь функции не изменяют состояние игры, а только получают некоторые
+    конкретные сведения, необходимые для выполнения действий.
     */
     public class GameInterface
     {
@@ -23,6 +22,8 @@ namespace RootBase
         // возвращает клетку по метке
         internal Site FindSite(string name) { return null; }
 
+        internal List<Site> GetCorners() { return null; }
+
         // возвращает клетку, которая противоположна заданной
         internal Site Opposite(Site from) { return null; }
 
@@ -30,10 +31,14 @@ namespace RootBase
         FactionType OwnedBy(Site where) { return FactionType.None; }
 
         // кто есть в указанной зоне
-        List<FactionType> WhosThere(Site where) { return null; }
+        internal List<GameObject> WhoIsThere(Site where) { return null; }
+
+        internal List<GameObject> SelectPlayerObjects(Site where, Player player) { return null; }
 
         // возвращает список мест, в которые можно попасть из указанной клетки
         List<Site> WhereToMove(Site from) { return null; }
+
+        public TurnPhase CurrentPhase { get { return this.State.CurrentPhase; } }
 
         // сколько есть объектов заданной масти для крафта у заданной фракции
         int HowManyCraftSources(FactionType faction, CardSuit suit)
@@ -61,22 +66,9 @@ namespace RootBase
         public static Player[] DefaultPlayerSet()
         {
             return new Player[] {
-                new Player(FactionType.MarquiseDeKote),
-                new Player(FactionType.WoodlandAlliance),
+                new Player(new MockController(), FactionBuilder.Get(FactionType.MarquiseDeKote)),
+                new Player(new MockController(), FactionBuilder.Get(FactionType.WoodlandAlliance)),
             };
-        }
-
-
-        // ДЕЙСТВИЯ
-        // FIXME: не факт, что действия должны быть аналогичным образом перечислены вот здесь или вообще
-        void Move(GameObject obj, Site toWhere) { }
-        void Fight(Site where, FactionType who, FactionType withWhom) { }
-
-        // добавляет новый объект в базу, если выполняется условие для фракции...
-        void Craft(FactionType who, GameObject what)
-        {
-            // проверяем, есть ли у фракции достаточно источников для крафта
-            // если да, помечаем источники как activated
         }
     }
 }

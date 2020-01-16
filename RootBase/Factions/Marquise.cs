@@ -7,10 +7,10 @@ namespace RootBase
     {
         public FactionType Type() { return FactionType.MarquiseDeKote; }
 
-        public List<Action> GetActions(TurnPhase phase)
+        public List<Action> GetActions(TurnPhase currentPhase)
         {
             var actions = new List<Action> { };
-            switch (phase)
+            switch (currentPhase)
             {
                 // все действия в рамках одной фазы выполняются сразу если могут,
                 // если не могут, то спрашивают выбор у игрока,
@@ -18,33 +18,40 @@ namespace RootBase
 
                 case TurnPhase.Setup1:
                     // TODO: считывать конструкции из Json
-                    // NOTE: в оригинале цитадель называется The Keep, приберегаем это слово на случай, если захотим использовать
-                    actions.Add(new Action("add citadel site=choose restriction=corner mandatory"));
+                    // NOTE: в оригинале цитадель называется The Keep
+                    actions.Add(new MandatoryAction(
+                        "Place Citadel on the map",
+                        (GameActionInterface gameAi, IController controller) =>
+                        {
+                            Site where = controller.PickSite(gameAi.Interface.GetCorners());
+                            gameAi.AddObject(new GameObject("Citadel", "Citadel"));
+                        }));
                     break;
 
                 case TurnPhase.Setup2:
                     // - поставить воина на каждую поляну, кроме той, что противоположна цитадели
                     // если нету choose, то ставятся автоматически.
                     // чтобы получить место, противоположное цитадели, надо сделать что-то типа функции
-                    actions.Add(new Action($"add { this.UnitName() } site=each restriction=corner,opposed(Map.Site.found(name=citadel))"));
+                    // actions.Add(new Action($"add { this.UnitName() } site=each restriction=corner,opposed(Map.Site.found(name=citadel))"));
                     // поскольку choose нет, действие обязательно, выполняется автоматически
 
-                    actions.Add(new Action("add sawmill site=choose restriction=Map.Site.ownedby(marquise),Map.Site.haveSlot() mandatory"));
-                    actions.Add(new Action($"add { this.CraftSource() } site=choose restriction=Map.Site.ownedby(marquise),Map.Site.haveSlot() mandatory"));
-                    actions.Add(new Action("add recruiter site=choose restriction=Map.Site.ownedby(marquise),Map.Site.haveSlot() mandatory"));
+                    // actions.Add(new Action("add sawmill site=choose restriction=Map.Site.ownedby(marquise),Map.Site.haveSlot() mandatory"));
+                    // actions.Add(new Action($"add { this.CraftSource() } site=choose restriction=Map.Site.ownedby(marquise),Map.Site.haveSlot() mandatory"));
+                    // actions.Add(new Action("add recruiter site=choose restriction=Map.Site.ownedby(marquise),Map.Site.haveSlot() mandatory"));
                     break;
                 case TurnPhase.Birdsong1:
                     // нужно ли wood считать отдельным объектом? по сути это счётчик
                     // actions.Add(new Action("add wood foreach=sawmill site=choose restriction=Map.Site.ownedby(marquise) mandatory"));
-                    actions.Add(new Action("inc wood foreach=sawmill"));
+                    // actions.Add(new Action("inc wood foreach=sawmill"));
                     break;
                 case TurnPhase.Daylight1:
-                    // TODO: как ограничить тремя действиями
-                    actions.Add(new Action("fight site=choose restriction=haveWarriors(marquise)"));
-                    actions.Add(new Action("move site=choose restriction=haveWarriors(marquise) distance=2"));
-                    actions.Add(new Action($"add {this.UnitName()} foreach=recruiter"));
+                    // Ограничение на три действия планируется через ресурсы.
+                    // Количество действий в день будет ресурсом, который будет тратиться по единице
+                    // actions.Add(new Action("fight site=choose restriction=haveWarriors(marquise)"));
+                    // actions.Add(new Action("move site=choose restriction=haveWarriors(marquise) distance=2"));
+                    // actions.Add(new Action($"add {this.UnitName()} foreach=recruiter"));
 
-                    actions.Add(new Action("add building type=choose site=choose restriction"));
+                    // actions.Add(new Action("add building type=choose site=choose restriction"));
                     break;
 
                 default:
@@ -64,9 +71,11 @@ namespace RootBase
                     return 0;
                 case 1:
                     return 1;
-                case 2: case 3:
+                case 2:
+                case 3:
                     return 2;
-                case 4: case 5:
+                case 4:
+                case 5:
                     return 3;
             }
 
