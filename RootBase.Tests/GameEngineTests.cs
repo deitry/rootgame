@@ -42,7 +42,7 @@ namespace RootBase.Tests
             var actions = new List<Action> {};
 
             // перебор по всем фазам
-            foreach (var phase in (TurnPhase[]) Enum.GetValues(typeof(TurnPhase))) {
+            foreach (var phase in (TurnStep[]) Enum.GetValues(typeof(TurnStep))) {
                 // собираем все доступные действия для игроков в рамках данной фазы
                 foreach (var player in engine.State.Players)
                 {

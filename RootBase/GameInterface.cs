@@ -30,6 +30,22 @@ namespace RootBase
         // кто владеет этой клеткой
         FactionType OwnedBy(Site where) { return FactionType.None; }
 
+        // все места, на которых есть воины указанной фракции - на которых можно сражаться
+        // FIXME: универсальную функцию типа Where с предикатом в качестве параметра
+        // и пусть каждый Action сам спрашивает что хочет
+        internal List<Site> InhabitedBy(IFaction faction)
+        {
+            return null;
+        }
+
+        //
+        internal List<Player> Enemies(Site where, Player friend)
+        {
+            // смотрим, чьи фишки представлены в данной клетке
+            // возврашаем всех, кто не является "другом"
+            return null;
+        }
+
         // кто есть в указанной зоне
         internal List<GameObject> WhoIsThere(Site where) { return null; }
 
@@ -38,7 +54,7 @@ namespace RootBase
         // возвращает список мест, в которые можно попасть из указанной клетки
         List<Site> WhereToMove(Site from) { return null; }
 
-        public TurnPhase CurrentPhase { get { return this.State.CurrentPhase; } }
+        public TurnStep CurrentPhase { get { return this.State.CurrentPhase; } }
 
         // сколько есть объектов заданной масти для крафта у заданной фракции
         int HowManyCraftSources(FactionType faction, CardSuit suit)

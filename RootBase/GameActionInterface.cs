@@ -57,17 +57,18 @@ namespace RootBase
         }
 
         // передвинуть фишку
-        void Move(GameObject obj, Site from, Site to)
+        internal void Move(GameObject obj, Site from, Site to)
         {
             // проверить, есть ли данный объект в точке from
             // замерить расстояние между from и to, проверить, что у игрока достаточно очков перемещения
             // осуществить перемещение
         }
 
-        void Fight(Site where, Player player, Player enemy)
+        internal void Fight(Site where, Player player, Player enemy)
         {
             var roll = new DiceRoll();
 
+            // уничтожить несколько объектов
             void killFew(uint howMany, Player player1, Player player2)
             {
                 for (uint i = 0; i < howMany; i++)
@@ -89,17 +90,30 @@ namespace RootBase
         void DiscardCard(Player player, uint amount = 1)
         {
             // переносим карты на кладбище
-            State.Discard.AddRange(player.Discard((uint)amount));
+            State.Cards.Discard.AddRange(player.Faction.Discard((uint)amount));
         }
 
-        // под крафтом понимается розыгрыш карты
-        void Craft(Player player, Card card)
+        // под крафтом понимается розыгрыш карты игроком с руки
+        bool Craft(Player player, Card card)
         {
             // проверяем, есть ли у фракции достаточно источников для крафта
-            if (player.SpendResource(card.Cost))
-            {
-                card.Effect.Handler(this, player.Controller);
-            }
+            if (!player.Faction.SpendResource(card.Cost))
+                return false;
+
+            // если смог потратиться - выполняем
+            card.Effect.Handler(this, player);
+
+            this.State.Cards.Discard.Add(card);
+            player.Faction.Hand.Remove(card);
+
+            return true;
+        }
+
+        // может быть как в плюс, так и в минус
+        internal void ChangeScore(Player player, int amount)
+        {
+            // if (this.State.Leaderboard.ContainsKey(player))
+            this.State.Leaderboard[player] += amount;
         }
     }
 }

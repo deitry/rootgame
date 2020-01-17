@@ -6,8 +6,8 @@ namespace RootBase
     {
         public readonly string Description;
 
-        internal delegate void ActionHandler(GameActionInterface gameAi, IController controller);
-        public readonly bool CanBePassed = true;
+        internal delegate void ActionHandler(GameActionInterface gameAi, Player player);
+        public virtual bool Passable() { return false; }
 
         internal Action(string description, ActionHandler handler)
         {
@@ -15,20 +15,15 @@ namespace RootBase
             this.Handler = handler;
         }
 
-        internal Action(string description, ActionHandler handler, bool canBePassed)
-        {
-            this.Description = description;
-            this.Handler = handler;
-            this.CanBePassed = canBePassed;
-        }
-
         internal ActionHandler Handler;
     }
 
     // чтобы прозрачнее обозначать вместо лишнего параметра в конструкторе
-    internal class MandatoryAction : Action
+    internal class PassableAction : Action
     {
-        internal MandatoryAction(string description, ActionHandler handler)
-            : base(description, handler, false) { }
+        internal PassableAction(string description, ActionHandler handler)
+            : base(description, handler) { }
+
+        public override bool Passable() { return true; }
     }
 }

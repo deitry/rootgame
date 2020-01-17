@@ -7,7 +7,7 @@ namespace RootBase
     {
         public FactionType Type() { return FactionType.MarquiseDeKote; }
 
-        public List<Action> GetActions(TurnPhase currentPhase)
+        internal override List<Action> GetActions(TurnStep currentPhase)
         {
             var actions = new List<Action> { };
             switch (currentPhase)
@@ -16,19 +16,19 @@ namespace RootBase
                 // если не могут, то спрашивают выбор у игрока,
                 // выбор произволен, если не сказано "mandatory", то действие можно пропустить
 
-                case TurnPhase.Setup1:
+                case TurnStep.Setup1:
                     // TODO: считывать конструкции из Json
                     // NOTE: в оригинале цитадель называется The Keep
-                    actions.Add(new MandatoryAction(
+                    actions.Add(new Action(
                         "Place Citadel on the map",
-                        (GameActionInterface gameAi, IController controller) =>
+                        (GameActionInterface gameAi, Player player) =>
                         {
-                            Site where = controller.PickSite(gameAi.Interface.GetCorners());
+                            Site where = player.Controller.PickSite(gameAi.Interface.GetCorners());
                             gameAi.AddObject(new GameObject("Citadel", "Citadel"));
                         }));
                     break;
 
-                case TurnPhase.Setup2:
+                case TurnStep.Setup2:
                     // - поставить воина на каждую поляну, кроме той, что противоположна цитадели
                     // если нету choose, то ставятся автоматически.
                     // чтобы получить место, противоположное цитадели, надо сделать что-то типа функции
@@ -39,12 +39,12 @@ namespace RootBase
                     // actions.Add(new Action($"add { this.CraftSource() } site=choose restriction=Map.Site.ownedby(marquise),Map.Site.haveSlot() mandatory"));
                     // actions.Add(new Action("add recruiter site=choose restriction=Map.Site.ownedby(marquise),Map.Site.haveSlot() mandatory"));
                     break;
-                case TurnPhase.Birdsong1:
+                case TurnStep.Birdsong1:
                     // нужно ли wood считать отдельным объектом? по сути это счётчик
                     // actions.Add(new Action("add wood foreach=sawmill site=choose restriction=Map.Site.ownedby(marquise) mandatory"));
                     // actions.Add(new Action("inc wood foreach=sawmill"));
                     break;
-                case TurnPhase.Daylight1:
+                case TurnStep.Daylight1:
                     // Ограничение на три действия планируется через ресурсы.
                     // Количество действий в день будет ресурсом, который будет тратиться по единице
                     // actions.Add(new Action("fight site=choose restriction=haveWarriors(marquise)"));
@@ -82,28 +82,39 @@ namespace RootBase
             throw new System.Exception($"Unexpected building count {number}");
         }
 
-        public string UnitName() { return "cat"; }
-        public string CraftSource() { return "workshop"; }
+        // public string UnitName() { return "cat"; }
+        // public string CraftSource() { return "workshop"; }
 
-        public Rules GetRules()
+        internal override Rules GetRules()
         {
-            return new Rules {
-                $"limit { this.UnitName() } 25",
-                $"limit { this.CraftSource() } 6",
-                "limit recruiter 6",
-                "limit sawmill 6",
-                "limit citadel 1",
+            return null;
+            // return new Rules {
+            //     $"limit { this.UnitName() } 25",
+            //     $"limit { this.CraftSource() } 6",
+            //     "limit recruiter 6",
+            //     "limit sawmill 6",
+            //     "limit citadel 1",
 
-                // триггеры:
-                // - пример присуждения победного очка
-                // добавить 1 победное очко, если количество лесопилок становится равным 2
-                "on count(sawmill)=2 inc score 1",
-                // глобальное умение: если воин маркизы убран с поля, можно потратить карту, совпадающую с
-                // мастью места, где была битва, чтобы вернуть воина в цитадель
-                // FIXME: с помощью текущего синтаксиса "скриптового языка" сложно описать "место, откуда был убран воин"
-                // Нужно понятие события
-                $"on rm({ this.UnitName() }) add { this.UnitName() } cost=card(1)"
-            };
+            //     // триггеры:
+            //     // - пример присуждения победного очка
+            //     // добавить 1 победное очко, если количество лесопилок становится равным 2
+            //     "on count(sawmill)=2 inc score 1",
+            //     // глобальное умение: если воин маркизы убран с поля, можно потратить карту, совпадающую с
+            //     // мастью места, где была битва, чтобы вернуть воина в цитадель
+            //     // FIXME: с помощью текущего синтаксиса "скриптового языка" сложно описать "место, откуда был убран воин"
+            //     // Нужно понятие события
+            //     $"on rm({ this.UnitName() }) add { this.UnitName() } cost=card(1)"
+            // };
+        }
+
+        public override int ResourceAmount(ResourceType type)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        internal override bool SpendResource(ResourceType type, int amount)
+        {
+            throw new System.NotImplementedException();
         }
     }
 }

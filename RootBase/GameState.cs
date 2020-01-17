@@ -2,16 +2,19 @@ using System.Collections.Generic;
 
 namespace RootBase
 {
+    // шаги внутри и снаружи фаз.
     // Возможные состояния машины состояний игрового движка.
     // Мб проще будет разделить на категории и int~инициатива внутри категории
-    public enum TurnPhase
+    public enum TurnStep
     {
         Setup1,
         Setup2,
         Setup3,
+        Birdsong0, // для срабатывания эффектов "в начале утра"
         Birdsong1,
         Birdsong2,
         Birdsong3,
+        Daylight0, // для срабатывания эффектов "в начале дня"
         Daylight1,
         Daylight2,
         Daylight3,
@@ -39,9 +42,10 @@ namespace RootBase
 
         public uint CurrentTurn { get; private set; }
         public Player CurrentPlayer { get; private set; }
-        public TurnPhase CurrentPhase { get; private set; }
+        public TurnStep CurrentPhase { get; private set; }
 
         readonly public Player[] Players;
+        readonly public Dictionary<Player, int> Leaderboard;
 
         // List выбран просто за удобство расширения/сокращения списка объектов
         // Список всех объектов в игре
@@ -54,9 +58,13 @@ namespace RootBase
         // Проверкой на правила будет заниматься движок.
         // Если не считать, что можно вводить дополнительные правила, то
         // список правил будет определяться картой + фракциями
-        public List<string> Rules;
+        public List<string> Rules { get; private set; }
 
-        internal void NextStep()
+        internal Cards Cards;
+
+        // перенести сюда Hand? Или оставить их у фракции?
+
+        private void NextStep()
         {
             // переходим на следующую фазу
             // если фазы кончились, переходим к следующему игроку

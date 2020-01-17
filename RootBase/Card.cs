@@ -8,8 +8,16 @@ namespace RootBase
     {
         // в стоимости карт используются только масти мест
         internal readonly Dictionary<SiteSuit, int> Suits;
+        internal TotalCost(int foxAmount, int rabbitAmount, int mouseAmount)
+        {
+            this.Suits = new Dictionary<SiteSuit, int>(){
+                {SiteSuit.Fox, foxAmount},
+                {SiteSuit.Rabbit, rabbitAmount},
+                {SiteSuit.Mouse, mouseAmount},
+            };
+        }
 
-        internal TotalCost(Dictionary<SiteSuit, int> suits) { this.Suits = suits; }
+        // internal TotalCost(Dictionary<SiteSuit, int> suits) { this.Suits = suits; }
     }
 
     // масть самой карты
@@ -34,9 +42,19 @@ namespace RootBase
 
     public class Card
     {
-        internal CardSuit Suit;
-        internal CardType Type;
-        internal TotalCost Cost;
-        internal Action Effect;
+        internal readonly string Name;
+        internal readonly CardSuit Suit;
+        internal readonly CardType Type;
+        internal readonly TotalCost Cost;
+        internal Action Effect { get; private set; }
+
+        internal Card(string name, CardSuit suit, CardType type, TotalCost cost, Action effect)
+        {
+            this.Name = name;
+            this.Suit = suit;
+            this.Type = type;
+            this.Cost = cost;
+            this.Effect = effect;
+        }
     }
 }
